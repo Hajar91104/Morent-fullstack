@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 
 type Props = {
   heading: string;
+  maxCols?: number;
 };
 
-const List = ({ heading }: Props) => {
+const List = ({ heading, maxCols = 4 }: Props) => {
   return (
     <div>
       <div className="flex items-center justify-between py-2.5">
@@ -17,7 +18,9 @@ const List = ({ heading }: Props) => {
           <Link to="/">View All</Link>
         </Button>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+      <div
+        className={`grid sm:grid-cols-2 lg:grid-cols-3  xl:grid-cols-${maxCols} gap-4 md:gap-6 lg:gap-8`}
+      >
         <RentCard />
         <RentCard />
         <RentCard />

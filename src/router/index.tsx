@@ -1,7 +1,9 @@
 import RootLayout from "@/components/shared/RootLayout";
 import { paths } from "@/constants/paths";
+import { DetailsPage } from "@/pages/details";
 import HomePage from "@/pages/home";
 import { RentListPage } from "@/pages/list";
+import { PaymentPage } from "@/pages/payment";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -16,6 +18,14 @@ export const router = createBrowserRouter([
       {
         path: paths.LIST,
         element: <RentListPage />,
+      },
+      {
+        path: paths.DETAIL(),
+        element: <DetailsPage />,
+      },
+      {
+        path: paths.PAYMENT,
+        element: <PaymentPage />,
       },
     ],
   },

@@ -1,6 +1,6 @@
 import { AvailabilityFilter } from "@/components/shared/availability-filter";
 import { Hero } from "./components/Hero";
-import List from "./components/List";
+import List from "../../components/shared/RentList";
 
 const HomePage = () => {
   return (
