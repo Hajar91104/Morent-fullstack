@@ -25,7 +25,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["admin", "user", "superadmin"],
+    enum: ["admin", "user"],
     default: "user",
   },
   resetPasswordToken: {
@@ -35,6 +35,17 @@ const userSchema = new Schema({
   resetPasswordTokenExpires: {
     type: Date,
     default: null,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+});
+
+userSchema.set("toJSON", {
+  virtuals: true,
+  transform: (doc, ret) => {
+    delete ret.__v;
   },
 });
 

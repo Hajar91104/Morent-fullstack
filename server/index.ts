@@ -5,11 +5,15 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
 import cors from "cors";
+import path from "path";
 
-// import authRoutes from "./routes/auth";
+import authRoutes from "./src/routes/auth";
+import locationRoutes from "./src/routes/location";
+import categoryRoutes from "./src/routes/category";
+import rentRoutes from "./src/routes/rent";
 // import usersRoutes from "./routes/users.mjs";
-import "./mongoose/schemas/user";
-import "./auth/local-strategy";
+import "./src/mongoose/schemas/user";
+import "./src/auth/local-strategy";
 
 dotenv.config();
 
@@ -35,10 +39,14 @@ app.use(
     },
   })
 );
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use("/auth", authRoutes);
+app.use("/auth", authRoutes);
+app.use("/location", locationRoutes);
+app.use("/category", categoryRoutes);
+app.use("/rent", rentRoutes);
 // app.use("/users", usersRoutes);
 
 app.listen(PORT, () => {
