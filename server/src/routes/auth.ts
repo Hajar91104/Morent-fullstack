@@ -20,11 +20,7 @@ router.post(
 
 router.post("/logout", authController.logout);
 
-router.get(
-  "/current-user",
-  authorize({ isAdmin: false }),
-  authController.currentUser
-);
+router.get("/current-user", authorize({}), authController.currentUser);
 
 router.post(
   "/forgot-password",

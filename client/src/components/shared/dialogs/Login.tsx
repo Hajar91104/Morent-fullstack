@@ -19,6 +19,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import authService from "@/services/auth";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { AuthResponseType } from "@/services/auth/types";
+import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/hooks/redux";
+import { getCurrentUserAsync } from "@/store/features/UserSlice";
 
 const formSchema = z.object({
   email: z.string().min(2).max(50),
@@ -35,15 +43,27 @@ export const LoginDialog = () => {
     },
   });
 
+  const dispatch = useAppDispatch();
+  const { mutate, isPending } = useMutation({
+    mutationFn: authService.login,
+    onSuccess: (response) => {
+      toast.success(response.data.message);
+      closeDialog();
+      dispatch(getCurrentUserAsync());
+    },
+    onError: (error: AxiosError<AuthResponseType>) => {
+      const message = error.response?.data?.message ?? "An error ocurred";
+      toast.error(message);
+    },
+  });
+
   if (isOpen && type !== ModalTypeEnum.LOGIN) {
     return null;
   }
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    mutate(values);
   }
 
   return (
@@ -89,7 +109,7 @@ export const LoginDialog = () => {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit">
+            <Button className="w-full" type="submit" disabled={isPending}>
               Sign In
             </Button>
           </form>

@@ -155,3 +155,66 @@ export const createRentSchema: Schema = {
     },
   },
 };
+export const editRentSchema: Schema = {
+  name: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  description: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  price: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  discount: {
+    in: ["body"],
+    isNumeric: true,
+    optional: true,
+  },
+  capacity: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  category: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  // showInRecommendation: {
+  //   in: ["body"],
+  //   isBoolean: true,
+  //   optional: true,
+  // },
+  pickUpLocation: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  dropOffLocation: {
+    in: ["body"],
+    isArray: true,
+    notEmpty: true,
+  },
+  fuel: {
+    in: ["body"],
+    isNumeric: true,
+    notEmpty: true,
+  },
+  gearBox: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  currency: {
+    in: ["body"],
+    isString: true,
+    optional: true,
+    notEmpty: true,
+  },
+};

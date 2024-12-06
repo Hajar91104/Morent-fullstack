@@ -9,7 +9,9 @@ passport.serializeUser((user: any, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
+  const user = await User.findById(id).select(
+    "-resetPasswordToken -resetPasswordTokenExpires"
+  );
   if (!user) {
     return done(new Error("User not found"));
   }
@@ -27,7 +29,7 @@ export default passport.use(
       try {
         const user = await User.findOne({
           email,
-        });
+        }).select("-resetPasswordToken -resetPasswordTokenExpires");
         if (!user || !comparePasswords(password, user.password)) {
           return done(null, false, {
             message: "Invalid email or password",

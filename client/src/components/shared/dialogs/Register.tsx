@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import authService from "@/services/auth";
+import { AxiosError } from "axios";
+import { AuthResponseType } from "@/services/auth/types";
+import { toast } from "sonner";
 
 const formSchema = z
   .object({
@@ -45,15 +50,26 @@ export const RegisterDialog = () => {
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: authService.register,
+    onSuccess: (response) => {
+      toast.success(response.data.message);
+      openDialog(ModalTypeEnum.LOGIN);
+    },
+    onError: (error: AxiosError<AuthResponseType>) => {
+      console.log(error.response?.data?.message);
+      const message = error.response?.data?.message || "An error ocurred";
+      toast.error(message);
+    },
+  });
+
   if (isOpen && type !== ModalTypeEnum.REGISTER) {
     return null;
   }
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
+    mutate(values);
   }
 
   return (
@@ -138,7 +154,7 @@ export const RegisterDialog = () => {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit">
+            <Button className="w-full" type="submit" disabled={isPending}>
               Register
             </Button>
           </form>
