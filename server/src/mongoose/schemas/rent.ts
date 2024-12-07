@@ -61,8 +61,10 @@ const rentSchema = new Schema({
     type: Date,
     default: Date.now(),
   },
-  reviews: [Types.ObjectId],
-  ref: "Review",
+  reviews: {
+    type: [Types.ObjectId],
+    ref: "Review",
+  },
   default: [],
 });
 

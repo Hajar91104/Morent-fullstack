@@ -24,7 +24,7 @@ export const getAllRentSchema: Schema = {
     isString: true,
     optional: true,
   },
-  category: {
+  categoryId: {
     in: ["query"],
     isString: true,
     optional: true,
@@ -108,7 +108,7 @@ export const createRentSchema: Schema = {
     isString: true,
     notEmpty: true,
   },
-  category: {
+  categoryId: {
     in: ["body"],
     isString: true,
     notEmpty: true,
@@ -181,7 +181,7 @@ export const editRentSchema: Schema = {
     isString: true,
     notEmpty: true,
   },
-  category: {
+  categoryId: {
     in: ["body"],
     isString: true,
     notEmpty: true,

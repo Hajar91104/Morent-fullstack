@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Location from "../mongoose/schemas/location";
 import Rent from "../mongoose/schemas/rent";
+import Category from "../mongoose/schemas/category";
+// import Category from "./category";
 // import rent from "../mongoose/schemas/rent";
 
 const getAll = async (req: Request, res: Response) => {
@@ -86,7 +88,7 @@ const create = async (req: Request, res: Response) => {
       description,
       pickUpLocation,
       dropOffLocations,
-      category,
+      categoryId,
       fuel,
       gearBox,
       capacity,
@@ -94,6 +96,15 @@ const create = async (req: Request, res: Response) => {
       currency,
       discount,
     } = req.matchedData;
+
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      res.status(404).json({
+        message: "Category not found!",
+      });
+      return;
+    }
 
     const images =
       (req.files as any)?.map((file: any) => {
@@ -111,9 +122,12 @@ const create = async (req: Request, res: Response) => {
       price,
       currency,
       discount,
+      images,
     });
 
     await rent.save();
+    category.rents.push(rent._id);
+    await category.save();
     res.status(201).json({
       message: "success",
       item: rent,
@@ -131,18 +145,40 @@ const edit = async (req: Request, res: Response) => {
     const data = {
       ...req.matchedData,
     };
+    const { categoryId } = data;
+
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      res.status(404).json({
+        message: "Category not found!",
+      });
+      return;
+    }
+
     if (req.files && (req.files as any).length > 0) {
       data.iamges = (req.files as any).map((file: any) => file.filename);
     }
-    const rent = await Rent.findByIdAndUpdate(id, data, {
-      new: true,
-    });
+
+    const rent = await Rent.findById(id);
+
     if (!rent) {
       res.status(404).json({
         message: "Not found",
       });
       return;
     }
+
+    const oldCategoryId = rent.category;
+
+    const oldCategory = await Category.findByIdAndUpdate(oldCategoryId, {
+      $pull: {
+        rents: id,
+      },
+    });
+    category.rents.push(rent._id);
+    await category.save();
+    rent.updateOne(data);
     res.json({
       message: "success",
       item: rent,

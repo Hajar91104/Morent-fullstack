@@ -7,13 +7,14 @@ import passport from "passport";
 import cors from "cors";
 import path from "path";
 
+import "./src/mongoose/schemas/review";
+
 import authRoutes from "./src/routes/auth";
 import locationRoutes from "./src/routes/location";
 import categoryRoutes from "./src/routes/category";
 import rentRoutes from "./src/routes/rent";
 import reservationRoutes from "./src/routes/reservation";
 // import usersRoutes from "./routes/users.mjs";
-import "./src/mongoose/schemas/user";
 import "./src/auth/local-strategy";
 
 dotenv.config();
@@ -50,7 +51,6 @@ app.use("/category", categoryRoutes);
 app.use("/rent", rentRoutes);
 app.use("/reservation", reservationRoutes);
 // app.use("/users", usersRoutes);
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
