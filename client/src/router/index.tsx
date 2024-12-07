@@ -6,7 +6,8 @@ import HomePage from "@/pages/(business)/home";
 import { RentListPage } from "@/pages/(business)/list";
 import { PaymentPage } from "@/pages/(business)/payment";
 import { DashboardMainPage } from "@/pages/(dashboard)/main";
-import { DashboardRentsPage } from "@/pages/(dashboard)/rents";
+import { DashboardRentListPage } from "@/pages/(dashboard)/rents/list";
+import { DashboardRentCreatePage } from "@/pages/(dashboard)/rents/create";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -39,8 +40,12 @@ export const router = createBrowserRouter([
             element: <DashboardMainPage />,
           },
           {
-            path: paths.DASHBOARD.RENTS,
-            element: <DashboardRentsPage />,
+            path: paths.DASHBOARD.RENTS.LIST,
+            element: <DashboardRentListPage />,
+          },
+          {
+            path: paths.DASHBOARD.RENTS.CREATE,
+            element: <DashboardRentCreatePage />,
           },
         ],
       },

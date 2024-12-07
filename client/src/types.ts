@@ -13,6 +13,23 @@ export type Location = {
   createdAt: string;
   name: string;
 };
+export type Rent = {
+  _id: string;
+  capacity: number;
+  category: Category;
+  createdAt: string;
+  currency: string;
+  description: string;
+  discount: number;
+  dropOffLocation: Location[];
+  fuel: string;
+  gearBox: string;
+  images: string[];
+  name: string;
+  pickUpLocation: Location;
+  price: number;
+  showInRecommendation: boolean;
+};
 export type Category = {
   _id: string;
   createdAt: string;

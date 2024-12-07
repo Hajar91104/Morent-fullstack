@@ -69,6 +69,13 @@ const getAll = async (req: Request, res: Response) => {
         .skip(skip)
         .limit(take)
         .populate(["category", "pickUpLocation", "dropOffLocations"]);
+
+      items.forEach((item) => {
+        item.images = item.images.map(
+          (image) => `${process.env.BASE_URL}/public/rent/${image}`
+        );
+      });
+
       res.json({
         message: "success",
         items,
