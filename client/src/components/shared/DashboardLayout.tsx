@@ -8,12 +8,15 @@ import { paths } from "@/constants/paths";
 
 export const DashboardLayout = () => {
   const { user, loading } = useAppSelector(selectUserData);
-  if (loading) {
+
+  if (loading || user === null) {
     return <div>Loading ...</div>;
   }
-  if (!user || user.role !== UserRole.Admin) {
+
+  if (user && user.role !== UserRole.Admin) {
     return <Navigate to={paths.HOME} />;
   }
+
   return (
     <SidebarProvider>
       <DashboardSidebar />
