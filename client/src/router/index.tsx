@@ -9,6 +9,7 @@ import { DashboardMainPage } from "@/pages/(dashboard)/main";
 import { DashboardRentListPage } from "@/pages/(dashboard)/rents/list";
 import { DashboardRentCreatePage } from "@/pages/(dashboard)/rents/create";
 import { createBrowserRouter } from "react-router-dom";
+import EditPage from "@/pages/(dashboard)/rents/edit";
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
           {
             path: paths.DASHBOARD.RENTS.CREATE,
             element: <DashboardRentCreatePage />,
+          },
+          {
+            path: paths.DASHBOARD.RENTS.EDIT(),
+            element: <EditPage />,
           },
         ],
       },

@@ -30,7 +30,7 @@ const rentSchema = new Schema({
     required: true,
   },
   fuel: {
-    type: String,
+    type: Number,
     required: true,
   },
   gearBox: {
@@ -64,8 +64,8 @@ const rentSchema = new Schema({
   reviews: {
     type: [Types.ObjectId],
     ref: "Review",
+    default: [],
   },
-  default: [],
 });
 
 rentSchema.set("toJSON", {

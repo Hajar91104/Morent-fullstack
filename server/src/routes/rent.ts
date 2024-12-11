@@ -12,6 +12,7 @@ import upload from "../middlewares/multer";
 const router = Router();
 
 router.get("/", validateSchema(getAllRentSchema), rentController.getAll);
+router.get("/:id", rentController.getById);
 router.post(
   "/",
   authorize({ isAdmin: true }),

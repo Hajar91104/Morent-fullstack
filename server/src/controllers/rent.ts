@@ -3,7 +3,6 @@ import Location from "../mongoose/schemas/location";
 import Rent from "../mongoose/schemas/rent";
 import Category from "../mongoose/schemas/category";
 // import Category from "./category";
-// import rent from "../mongoose/schemas/rent";
 
 const getAll = async (req: Request, res: Response) => {
   try {
@@ -64,23 +63,21 @@ const getAll = async (req: Request, res: Response) => {
       // if (filter.$and.lenght === 0) {
       //   delete filter.$and;
       // }
-
-      const items = await Rent.find(filter)
-        .skip(skip)
-        .limit(take)
-        .populate(["category", "pickUpLocation", "dropOffLocations"]);
-
-      items.forEach((item) => {
-        item.images = item.images.map(
-          (image) => `${process.env.BASE_URL}/public/rent/${image}`
-        );
-      });
-
-      res.json({
-        message: "success",
-        items,
-      });
     }
+    const items = await Rent.find(filter)
+      .skip(skip)
+      .limit(take)
+      .populate(["category", "pickUpLocation", "dropOffLocations"]);
+
+    items.forEach((item) => {
+      item.images = item.images.map(
+        (image) => `${process.env.BASE_URL}/public/rent/${image}`
+      );
+    });
+    res.status(201).json({
+      message: "success",
+      items,
+    });
   } catch (error) {
     res.status(500).json({
       message: "Internal server error",
@@ -113,10 +110,12 @@ const create = async (req: Request, res: Response) => {
       return;
     }
 
-    const images =
-      (req.files as any)?.map((file: any) => {
-        file.filename;
-      }) || [];
+    // const images =
+    //   (req.files as any)?.map((file: any) => {
+    //     file.filename;
+    //   }) || [];
+    const images = (req.files as any)?.map((file: any) => file.filename) || [];
+
     const rent = new Rent({
       name,
       description,
@@ -133,9 +132,44 @@ const create = async (req: Request, res: Response) => {
     });
 
     await rent.save();
+
     category.rents.push(rent._id);
     await category.save();
     res.status(201).json({
+      message: "success",
+      item: rent,
+    });
+  } catch (error) {
+    console.error("Error creating rent:", error);
+
+    res.json({
+      message: error,
+    });
+  }
+};
+
+const getById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const rent = await Rent.findById(id).populate([
+      "category",
+      "pickUpLocation",
+      "dropOffLocations",
+    ]);
+
+    if (!rent) {
+      res.status(404).json({
+        message: "Not found",
+      });
+      return;
+    }
+
+    rent.images = rent.images.map(
+      (image) => `${process.env.BASE_URL}/public/rent/${image}`
+    );
+
+    res.json({
       message: "success",
       item: rent,
     });
@@ -185,7 +219,21 @@ const edit = async (req: Request, res: Response) => {
     });
     category.rents.push(rent._id);
     await category.save();
-    rent.updateOne(data);
+
+    rent.name = data.name;
+    rent.description = data.description;
+    rent.category = data.categoryId;
+    rent.pickUpLocation = data.pickUpLocation;
+    rent.dropOffLocations = data.dropOffLocations;
+    rent.fuel = data.fuel;
+    rent.gearBox = data.gearBox;
+    rent.capacity = data.capacity;
+    rent.price = data.price;
+    rent.discount = data.discount;
+    if (data.images) rent.images = data.images;
+
+    await rent.save();
+
     res.json({
       message: "success",
       item: rent,
@@ -222,6 +270,7 @@ const remove = async (req: Request, res: Response) => {
 };
 export default {
   getAll,
+  getById,
   create,
   edit,
   remove,
