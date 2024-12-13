@@ -1,4 +1,5 @@
 import { Schema } from "express-validator";
+import mongoose from "mongoose";
 
 export const getAllRentSchema: Schema = {
   type: {
@@ -113,11 +114,11 @@ export const createRentSchema: Schema = {
     isString: true,
     notEmpty: true,
   },
-  // showInRecommendation: {
-  //   in: ["body"],
-  //   isBoolean: true,
-  //   optional: true,
-  // },
+  showInRecommendation: {
+    in: ["body"],
+    isBoolean: true,
+    optional: true,
+  },
   pickUpLocation: {
     in: ["body"],
     isString: true,
@@ -186,11 +187,11 @@ export const editRentSchema: Schema = {
     isString: true,
     notEmpty: true,
   },
-  // showInRecommendation: {
-  //   in: ["body"],
-  //   isBoolean: true,
-  //   optional: true,
-  // },
+  showInRecommendation: {
+    in: ["body"],
+    isBoolean: true,
+    optional: true,
+  },
   pickUpLocation: {
     in: ["body"],
     isString: true,

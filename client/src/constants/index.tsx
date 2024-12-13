@@ -5,3 +5,4 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/webp",
 ];
+export const LIST_TAKE_COUNT = 2;

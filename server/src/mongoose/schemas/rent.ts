@@ -12,7 +12,7 @@ const rentSchema = new Schema({
   },
   showInRecommendation: {
     type: Boolean,
-    default: false,
+    // default: false,
   },
   pickUpLocation: {
     type: Types.ObjectId,

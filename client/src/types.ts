@@ -16,7 +16,7 @@ export type Location = {
 export type Rent = {
   _id: string;
   name: string;
-  fuel: string;
+  fuel: number;
   gearBox: string;
   price: number;
   description: string;

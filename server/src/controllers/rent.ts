@@ -65,10 +65,11 @@ const getAll = async (req: Request, res: Response) => {
       // }
     }
     const items = await Rent.find(filter)
-      .skip(skip)
-      .limit(take)
+      .skip(+skip)
+      .limit(+take)
       .populate(["category", "pickUpLocation", "dropOffLocations"]);
 
+    const total = await Rent.countDocuments(filter);
     items.forEach((item) => {
       item.images = item.images.map(
         (image) => `${process.env.BASE_URL}/public/rent/${image}`
@@ -77,6 +78,9 @@ const getAll = async (req: Request, res: Response) => {
     res.status(201).json({
       message: "success",
       items,
+      total,
+      take: +take,
+      skip: +skip,
     });
   } catch (error) {
     res.status(500).json({
@@ -99,6 +103,7 @@ const create = async (req: Request, res: Response) => {
       price,
       currency,
       discount,
+      showInRecommendation,
     } = req.matchedData;
 
     const category = await Category.findById(categoryId);
@@ -129,6 +134,7 @@ const create = async (req: Request, res: Response) => {
       currency,
       discount,
       images,
+      showInRecommendation,
     });
 
     await rent.save();
@@ -186,6 +192,8 @@ const edit = async (req: Request, res: Response) => {
     const data = {
       ...req.matchedData,
     };
+
+    // data.dropOffLocations = JSON.parse(req.body.dropOffLocations || "[]");
     const { categoryId } = data;
 
     const category = await Category.findById(categoryId);
@@ -231,6 +239,8 @@ const edit = async (req: Request, res: Response) => {
     rent.price = data.price;
     rent.discount = data.discount;
     if (data.images) rent.images = data.images;
+    if (data.showInRecommendation !== undefined)
+      rent.showInRecommendation = data.showInRecommendation;
 
     await rent.save();
 

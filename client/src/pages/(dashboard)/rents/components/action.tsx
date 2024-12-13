@@ -53,7 +53,7 @@ const getFormSchema = (isEdit: boolean) =>
       })
       .positive(),
     categoryId: z.string().min(2, { message: "Category is required" }),
-    fuel: z.string().min(2),
+    fuel: z.number(),
     gearBox: z.string().min(2),
     pickUpLocation: z.string().min(2),
     dropOffLocations: z.array(z.string().min(2)),
@@ -155,6 +155,8 @@ export const ActionForm = ({ type }: Props) => {
       ...(isEdit ? { id } : {}),
     };
     const promise = mutateAsync(payload);
+    console.log(payload);
+
     toast.promise(promise, {
       loading: "Creating rent...",
       success: "Rent created successfully",
@@ -214,7 +216,16 @@ export const ActionForm = ({ type }: Props) => {
                 <FormItem>
                   <FormLabel>Fuel</FormLabel>
                   <FormControl>
-                    <Input placeholder="1oL" {...field} />
+                    <Input
+                      type="number"
+                      placeholder="1oL"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange({
+                          target: { value: parseFloat(e.target.value) },
+                        });
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
