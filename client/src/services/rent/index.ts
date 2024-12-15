@@ -3,21 +3,22 @@ import {
   RentRequestPayload,
   GetAllRentsResponseType,
   GetByIdRentResponseType,
-  GetAllRequestQueryData,
 } from "./types";
 
-const getAll = async (queryData: GetAllRequestQueryData) => {
-  const searchParams = new URLSearchParams();
-  const keys = Object.keys(queryData);
+const getAll = async (
+  pageParams: {
+    take?: number;
+    skip?: number;
+    type?: "recommended" | "popular";
+  },
+  searchParamsStr?: string
+) => {
+  const searchParams = new URLSearchParams(searchParamsStr);
 
-  keys.forEach((key) => {
-    if (queryData[key as keyof GetAllRequestQueryData]) {
-      searchParams.append(
-        key,
-        String(queryData[key as keyof GetAllRequestQueryData])
-      );
-    }
-  });
+  if (pageParams.take) searchParams.append("take", pageParams.take.toString());
+  if (pageParams.skip) searchParams.append("skip", pageParams.skip.toString());
+  if (pageParams.type) searchParams.append("type", pageParams.type);
+
   return await axiosInstance.get<GetAllRentsResponseType>(
     `/rent?${searchParams.toString()}`
   );

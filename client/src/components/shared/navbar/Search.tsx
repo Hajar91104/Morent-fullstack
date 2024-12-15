@@ -11,16 +11,16 @@ export const Search = () => {
   const isListingPage = location.pathname.includes("list");
 
   function handleSearch(searchText: string) {
+    clearTimeout(timeoutId);
     if (!searchText) {
       searchParams.delete("search");
       setSearchParams(searchParams);
       return;
     }
-    clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       searchParams.set("search", searchText);
       setSearchParams(searchParams);
-      if (!isListingPage) navigate(paths.LIST + `${searchParams.toString()}`);
+      if (!isListingPage) navigate(paths.LIST + `?${searchParams.toString()}`);
     }, 300);
   }
   return (

@@ -25,9 +25,8 @@ export const getAllRentSchema: Schema = {
     isString: true,
     optional: true,
   },
-  categoryId: {
+  category: {
     in: ["query"],
-    isString: true,
     optional: true,
   },
   capacity: {
@@ -197,7 +196,7 @@ export const editRentSchema: Schema = {
     isString: true,
     notEmpty: true,
   },
-  dropOffLocation: {
+  dropOffLocations: {
     in: ["body"],
     isArray: true,
     notEmpty: true,

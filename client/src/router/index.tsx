@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
         element: <DetailsPage />,
       },
       {
-        path: paths.PAYMENT,
+        path: paths.PAYMENT(),
         element: <PaymentPage />,
       },
       {

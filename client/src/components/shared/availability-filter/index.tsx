@@ -40,20 +40,20 @@ export const AvailabilityFilter = () => {
 
   const handleSwap = () => {
     setRotate(!rotate);
-    const pickupLocation = searchParams.get("pickUp-location");
-    const dropoffLocation = searchParams.get("dropOff-location");
+    const pickupLocation = searchParams.get("pickup_location");
+    const dropoffLocation = searchParams.get("dropoff_location");
 
-    if (dropoffLocation) searchParams.set("pickUp-location", dropoffLocation);
-    else searchParams.delete("pickUp-location");
-    if (pickupLocation) searchParams.set("dropOff-location", pickupLocation);
-    else searchParams.delete("dropOff-location");
+    if (dropoffLocation) searchParams.set("pickup_location", dropoffLocation);
+    else searchParams.delete("pickup_location");
+    if (pickupLocation) searchParams.set("dropoff_location", pickupLocation);
+    else searchParams.delete("dropoff_location");
     setSearchParams(searchParams);
   };
 
   return (
     <div className="grid lg:grid-cols-[1fr_60px_1fr] gap-x-5 lg:gap-x-7 xl:gap-x-[44px] items-center">
       <Card
-        type="pickUp"
+        type="pickup"
         locationOptions={locationsOptions}
         categoryOptions={categoriesOptions}
         heading={
@@ -77,7 +77,7 @@ export const AvailabilityFilter = () => {
         <img src={SwapIcon} alt="Swap" className="w-6 h-6" />
       </Button>
       <Card
-        type="dropOff"
+        type="dropoff"
         locationOptions={locationsOptions}
         categoryOptions={categoriesOptions}
         heading={
@@ -104,17 +104,17 @@ const Card = ({
   locationOptions: SelectOption[];
   categoryOptions: SelectOption[];
   heading: React.ReactNode;
-  type: "pickUp" | "dropOff";
+  type: "pickup" | "dropoff";
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const selectedLocation = searchParams.get(`${type}-location`);
-  const selectedDate = searchParams.get(`${type}-date`);
+  const selectedLocation = searchParams.get(`${type}_location`);
+  const selectedDate = searchParams.get(`${type}_date`);
   // const selectedCategory = searchParams.get(`${type}-category`);
 
   function handleChange(field: string, value: string) {
-    searchParams.set(`${type}-${field}`, value);
+    searchParams.set(`${type}_${field}`, value);
     setSearchParams(searchParams);
     if (location.pathname === "/") {
       navigate(paths.LIST + "?" + searchParams.toString());

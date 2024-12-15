@@ -46,12 +46,10 @@ const getFormSchema = (isEdit: boolean) =>
         required_error: "Price is required",
       })
       .positive(),
-    discount: z
-      .number({
-        invalid_type_error: "Discount must be a number",
-        required_error: "Discount is required",
-      })
-      .positive(),
+    discount: z.number({
+      invalid_type_error: "Discount must be a number",
+      required_error: "Discount is required",
+    }),
     categoryId: z.string().min(2, { message: "Category is required" }),
     fuel: z.number(),
     gearBox: z.string().min(2),

@@ -21,15 +21,16 @@ const getAll = async (req: Request, res: Response) => {
 
     const filter: Record<string, any> = {
       $and: [],
+      $or: [],
     };
     if (type === "recommended") {
       filter.showInRecommendation = true;
     }
     if (search) {
-      filter.OR = [
+      filter.$or.push(
         { name: { $regex: new RegExp(search, "i") } },
-        { description: { $regex: new RegExp(search, "i") } },
-      ];
+        { description: { $regex: new RegExp(search, "i") } }
+      );
     }
 
     if (capacity) {
@@ -51,13 +52,11 @@ const getAll = async (req: Request, res: Response) => {
     }
 
     if (pickup_location) {
-      filter.pickup_location = pickup_location;
+      filter.pickUpLocation = pickup_location;
     }
     if (dropoff_location) {
-      filter.dropoff_location = {
-        $elemMatch: {
-          location: pickup_location,
-        },
+      filter.dropOffLocations = {
+        $in: [dropoff_location],
       };
 
       // if (filter.$and.lenght === 0) {

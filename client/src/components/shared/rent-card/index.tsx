@@ -1,15 +1,15 @@
 import HeartOutlinedImg from "@/assets/icons/heart-outlined.svg";
 import HeartFilledImg from "@/assets/icons/heart-filled.svg";
-import Car from "@/assets/images/Car.png";
 import FuelImg from "@/assets/icons/fuel.svg";
 import TransmissionImg from "@/assets/icons/transmission.svg";
 import PeopleImg from "@/assets/icons/people.svg";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { paths } from "@/constants/paths";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Rent } from "@/types";
+import { formatPrice } from "@/lib/utils";
 
 type Props = {
   rent: Rent;
@@ -17,24 +17,19 @@ type Props = {
 
 const RentCard = ({ rent }: Props) => {
   const [isLiked, setIsLiked] = useState(false);
-  const navigate = useNavigate();
-  const id = "ecubhb";
 
-  const { name, category, fuel, gearBox, images, capacity, price } = rent;
+  const { _id, name, category, fuel, gearBox, images, capacity, price } = rent;
   const mainImage = images[0];
-  function NavigateDetail() {
-    navigate(paths.DETAIL(id));
-  }
   return (
     <div className="w-full bg-white rounded-[10px] p-4 lg:p-6">
       <div className="flex justify-between">
         <div>
-          <h4
-            onClick={NavigateDetail}
+          <Link
+            to={paths.DETAIL(_id)}
             className="font-bold text-secondary-500 text-base lg:text-xl leading-[150%] tracking-[-0.6px] cursor-pointer hover:underline"
           >
             {name}
-          </h4>
+          </Link>
           <p className="text-secondary-300 text-xs lg:text-sm leading-[150%] tracking-[-0.28px]">
             {category.name}
           </p>
@@ -48,13 +43,15 @@ const RentCard = ({ rent }: Props) => {
           <img src={isLiked ? HeartFilledImg : HeartOutlinedImg} alt="heart" />
         </button>
       </div>
-      <div
-        onClick={NavigateDetail}
+
+      <Link
+        to={paths.DETAIL(_id)}
         className="mt-8 lg:mt-12 relative cursor-pointer"
       >
         <img src={mainImage} alt="car" className="w-full h-32 object-contain" />
         <div className="bg-[linear-gradient(180deg,rgba(255,255,255,0.00)0%,#FFF_100%)] w-full h-[68px] absolute bottom-0" />
-      </div>
+      </Link>
+
       <div className="flex justify-between items-center mt-5 lg:mt-9">
         <div className="flex gap-1.5 items-center">
           <img src={FuelImg} alt="fuel" />
@@ -77,9 +74,12 @@ const RentCard = ({ rent }: Props) => {
       </div>
       <div className="flex items-center justify-between mt-3 lg:mt-6">
         <p className="text-secondary-500 text-xl font-bold">
-          ${price}/ <span className="text-sm text-secondary-300">day</span>
+          {formatPrice(price)}/{" "}
+          <span className="text-sm text-secondary-300">day</span>
         </p>
-        <Button>Rent Now</Button>
+        <Button asChild>
+          <Link to={paths.PAYMENT(_id)}>Rent Now</Link>
+        </Button>
       </div>
     </div>
   );

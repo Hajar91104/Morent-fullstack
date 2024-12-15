@@ -5,4 +5,5 @@ export const QUERY_KEYS = {
   LOCATIONS: "locations",
   RECOMMENDATION_RENTS: "recommendationRents",
   RENT_LIST: "rentList",
+  RENT_DETAIL: "rentDetail",
 };
