@@ -20,22 +20,47 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/constants/query-keys";
+
+import { RenderIf } from "@/components/shared/RenderIf";
+import { DatePickerDemo } from "@/components/ui/date-picker";
+import { cn } from "@/lib/utils";
+import { Location } from "@/types";
+
+import { useParams } from "react-router-dom";
+import { AxiosResponse } from "axios";
+import { GetByIdRentResponseType } from "@/services/rent/types";
+import { useEffect } from "react";
 
 const FormSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  phoneNumber: z.string(),
-  address: z.string(),
+  phoneNumber: z.string().min(1, {
+    message: "Phone number is required",
+  }),
+  address: z.string().min(4, {
+    message: "Address is required",
+  }),
   city: z.string(),
-  pickUpLocation: z.string(),
-  dropOffLocation: z.string(),
-  pickUpDate: z.string(),
-  dropOffDate: z.string(),
-  pickUpTime: z.string(),
-  dropOffTime: z.string(),
+  pickUpLocation: z.string().min(1, {
+    message: "Pick Up Location is required",
+  }),
+  dropOffLocation: z.string().min(1, {
+    message: "Drop Off Location is required",
+  }),
+  pickUpDate: z.string().min(1, {
+    message: "Pick Up Date is required",
+  }),
+  dropOffDate: z.string().min(1, {
+    message: "Drop Off Date is required",
+  }),
   newsletter: z.boolean(),
-  termsConditions: z.boolean(),
+  termsConditions: z.literal<boolean>(true, {
+    message: "You must accept the terms and conditions",
+  }),
 });
 
 type FormType = UseFormReturn<z.infer<typeof FormSchema>>;
@@ -52,8 +77,6 @@ export const Steps = () => {
       dropOffLocation: "",
       pickUpDate: "",
       dropOffDate: "",
-      pickUpTime: "",
-      dropOffTime: "",
       newsletter: false,
       termsConditions: false,
     },
@@ -113,7 +136,12 @@ const BillingStep = ({ form }: { form: FormType }) => {
             <FormItem>
               <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="Phone number" {...field} />
+                <PhoneInput
+                  defaultCountry="AZ"
+                  international
+                  {...field}
+                  placeholder="Phone number"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -151,6 +179,27 @@ const BillingStep = ({ form }: { form: FormType }) => {
 };
 
 const RentalStep = ({ form }: { form: FormType }) => {
+  const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
+  const data = queryClient.getQueryData([
+    QUERY_KEYS.RENT_DETAIL,
+    id,
+  ]) as AxiosResponse;
+  const rentData = (data?.data as GetByIdRentResponseType) || null;
+  const possibleDropOffLocations =
+    (rentData?.item.dropOffLocations as Location[]) ?? [];
+
+  const pickUpLocation = (rentData?.item.pickUpLocation as Location) || null;
+
+  useEffect(() => {
+    form.setValue("pickUpLocation", pickUpLocation._id);
+  }, []);
+  // const { data: locationData, isLoading: locationLoadding } = useQuery({
+  //   queryKey: [QUERY_KEYS.LOCATIONS],
+  //   queryFn: locationService.getAll,
+  // });
+
+  // const locations = locationData?.data?.items ?? [];
   return (
     <div className="rounded-[10px] bg-white w-full lg:p-6 p-4">
       <div className="flex justify-between items-end">
@@ -181,16 +230,16 @@ const RentalStep = ({ form }: { form: FormType }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your city" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
+                  <SelectItem value={pickUpLocation._id} disabled>
+                    {pickUpLocation.name}
+                  </SelectItem>
                 </SelectContent>
               </Select>
 
@@ -204,41 +253,11 @@ const RentalStep = ({ form }: { form: FormType }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Date</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your date" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="pickUpTime"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Time</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your time" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
+              <DatePickerDemo
+                variant="secondary"
+                hidePastDates
+                onChange={(date) => field.onChange(date?.toISOString() || "")}
+              />
 
               <FormMessage />
             </FormItem>
@@ -267,9 +286,16 @@ const RentalStep = ({ form }: { form: FormType }) => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
+                  <RenderIf condition={possibleDropOffLocations.length === 0}>
+                    <SelectItem disabled value="-">
+                      No drop off locations available
+                    </SelectItem>
+                  </RenderIf>
+                  {possibleDropOffLocations.map((location) => (
+                    <SelectItem key={location._id} value={location._id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -283,41 +309,11 @@ const RentalStep = ({ form }: { form: FormType }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Date</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your date" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dropOffTime"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Time</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your time" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
+              <DatePickerDemo
+                variant="secondary"
+                hidePastDates
+                onChange={(date) => field.onChange(date?.toISOString() || "")}
+              />
 
               <FormMessage />
             </FormItem>
@@ -329,6 +325,7 @@ const RentalStep = ({ form }: { form: FormType }) => {
 };
 
 const ConfirmationStep = ({ form }: { form: FormType }) => {
+  const errors = form.formState.errors;
   return (
     <div className="rounded-[10px] bg-white w-full lg:p-6 p-4">
       <div className="flex justify-between items-end">
@@ -376,7 +373,12 @@ const ConfirmationStep = ({ form }: { form: FormType }) => {
               />
             </FormControl>
             <div className="leading-none">
-              <FormLabel className="cursor-pointer">
+              <FormLabel
+                className={cn(
+                  "cursor-pointer",
+                  errors.termsConditions && "text-red-500"
+                )}
+              >
                 I agree with our terms and conditions and privacy policy.
               </FormLabel>
             </div>
