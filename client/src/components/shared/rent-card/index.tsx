@@ -10,6 +10,10 @@ import { paths } from "@/constants/paths";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Rent } from "@/types";
 import { formatPrice } from "@/lib/utils";
+import { useSelector } from "react-redux";
+import { selectUserData } from "@/store/features/userSlice";
+import { toast } from "sonner";
+import { ModalTypeEnum, useDialog } from "@/hooks/useDialog";
 
 type Props = {
   rent: Rent;
@@ -17,6 +21,8 @@ type Props = {
 
 const RentCard = ({ rent }: Props) => {
   const [isLiked, setIsLiked] = useState(false);
+  const { user } = useSelector(selectUserData);
+  const { openDialog } = useDialog();
 
   const { _id, name, category, fuel, gearBox, images, capacity, price } = rent;
   const mainImage = images[0];
@@ -78,7 +84,17 @@ const RentCard = ({ rent }: Props) => {
           <span className="text-sm text-secondary-300">day</span>
         </p>
         <Button asChild>
-          <Link to={paths.PAYMENT(_id)}>Rent Now</Link>
+          <Link
+            to={paths.PAYMENT(_id)}
+            onClick={() => {
+              if (!user) {
+                toast.warning("Please login to rent a car");
+                openDialog(ModalTypeEnum.LOGIN);
+              }
+            }}
+          >
+            Rent Now
+          </Link>
         </Button>
       </div>
     </div>

@@ -6,12 +6,42 @@ export const createReservationSchema: Schema = {
     isString: true,
     notEmpty: true,
   },
-  statDate: {
+  startDate: {
     in: ["body"],
     isString: true,
     notEmpty: true,
   },
   endDate: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  pickUpLocation: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  dropOffLocations: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  billingName: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  billingPhoneNumber: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  billingAddress: {
+    in: ["body"],
+    isString: true,
+    notEmpty: true,
+  },
+  billingTownCity: {
     in: ["body"],
     isString: true,
     notEmpty: true,

@@ -3,17 +3,16 @@ import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { QUERY_KEYS } from "@/constants/query-keys";
 
-import rentService from "@/services/rent";
 import { Spinner } from "@/components/shared/Spinner";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { paths } from "@/constants/paths";
+import reservationService from "@/services/reservation";
 
-export const DashboardRentListPage = () => {
+export const DashboardReservationsListPage = () => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: [QUERY_KEYS.ADMIN_RENTS],
-    queryFn: () => rentService.getAll(),
+    queryKey: [QUERY_KEYS.ADMIN_RESERVATIONS],
+    queryFn: () => reservationService.getAll(),
   });
+
+  console.log(data);
 
   if (isLoading) {
     return (
@@ -31,10 +30,7 @@ export const DashboardRentListPage = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-primary font-bold text-2xl ">Rents</h3>
-        <Button asChild>
-          <Link to={paths.DASHBOARD.RENTS.CREATE}>Create Rent</Link>
-        </Button>
+        <h3 className="text-primary font-bold text-2xl ">Reservations</h3>
       </div>
       <DataTable columns={columns} data={items} />
     </div>

@@ -27,6 +27,7 @@ export type Rent = {
   category: Category;
   dropOffLocations: Location[];
   images: string[];
+  total: number;
   pickUpLocation: Location;
   showInRecommendation: boolean;
 };
@@ -36,7 +37,27 @@ export type Category = {
   name: string;
   count: number;
 };
-
+export type Reservation = {
+  billing: {
+    name: string;
+    phoneNumber: string;
+    address: string;
+    townCity: string;
+  };
+  createdAt: string;
+  dropOffLocations: string;
+  endDate: string;
+  id: string;
+  pickUpLocation: string;
+  rent: Rent | string;
+  startDate: string;
+  status: ReservationStatus;
+  total: number;
+  updatedAt: string;
+  user: string;
+  _id: string;
+  hasReview: boolean;
+};
 export type SelectOption = {
   value: string;
   label: string;
@@ -45,4 +66,10 @@ export type SelectOption = {
 export enum UserRole {
   Admin = "admin",
   User = "user",
+}
+export enum ReservationStatus {
+  Pending = "pending",
+  Approved = "approved",
+  Rejected = "rejected",
+  Canceled = "canceled",
 }

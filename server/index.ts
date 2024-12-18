@@ -14,6 +14,7 @@ import locationRoutes from "./src/routes/location";
 import categoryRoutes from "./src/routes/category";
 import rentRoutes from "./src/routes/rent";
 import reservationRoutes from "./src/routes/reservation";
+import reviewRoutes from "./src/routes/review";
 // import usersRoutes from "./routes/users.mjs";
 import "./src/auth/local-strategy";
 
@@ -50,6 +51,7 @@ app.use("/location", locationRoutes);
 app.use("/category", categoryRoutes);
 app.use("/rent", rentRoutes);
 app.use("/reservation", reservationRoutes);
+app.use("/review", reviewRoutes);
 // app.use("/users", usersRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

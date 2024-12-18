@@ -21,7 +21,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/query-keys";
 
 import { RenderIf } from "@/components/shared/RenderIf";
@@ -29,10 +29,15 @@ import { DatePickerDemo } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 import { Location } from "@/types";
 
-import { useParams } from "react-router-dom";
-import { AxiosResponse } from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { AxiosError, AxiosResponse } from "axios";
 import { GetByIdRentResponseType } from "@/services/rent/types";
 import { useEffect } from "react";
+import reservationService from "@/services/reservation";
+import { Spinner } from "@/components/shared/Spinner";
+import { paths } from "@/constants/paths";
+import { toast } from "sonner";
+import { CreateReservationResponseType } from "@/services/reservation/type";
 
 const FormSchema = z.object({
   name: z.string().min(2, {
@@ -48,7 +53,7 @@ const FormSchema = z.object({
   pickUpLocation: z.string().min(1, {
     message: "Pick Up Location is required",
   }),
-  dropOffLocation: z.string().min(1, {
+  dropOffLocations: z.string().min(1, {
     message: "Drop Off Location is required",
   }),
   pickUpDate: z.string().min(1, {
@@ -66,6 +71,8 @@ const FormSchema = z.object({
 type FormType = UseFormReturn<z.infer<typeof FormSchema>>;
 
 export const Steps = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -74,7 +81,7 @@ export const Steps = () => {
       address: "",
       city: "",
       pickUpLocation: "",
-      dropOffLocation: "",
+      dropOffLocations: "",
       pickUpDate: "",
       dropOffDate: "",
       newsletter: false,
@@ -82,8 +89,31 @@ export const Steps = () => {
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: reservationService.create,
+    onSuccess: () => {
+      toast.success("Reservation created successfully");
+      navigate(paths.RESERVATIONS);
+      form.reset();
+    },
+    onError: (error: AxiosError<CreateReservationResponseType>) => {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    },
+  });
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
+    const payload = {
+      rentId: id!,
+      startDate: data.pickUpDate,
+      endDate: data.dropOffDate,
+      billingName: data.name,
+      billingPhoneNumber: data.phoneNumber,
+      billingAddress: data.address,
+      billingTownCity: data.city,
+      dropOffLocations: data.dropOffLocations,
+      pickUpLocation: data.pickUpLocation,
+    };
+    mutate(payload);
   }
   return (
     <Form {...form}>
@@ -93,7 +123,7 @@ export const Steps = () => {
       >
         <BillingStep form={form} />
         <RentalStep form={form} />
-        <ConfirmationStep form={form} />
+        <ConfirmationStep pending={isPending} form={form} />
       </form>
     </Form>
   );
@@ -275,7 +305,7 @@ const RentalStep = ({ form }: { form: FormType }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 lg:gap-x-8 gap-y-4 lg:gap-y-6">
         <FormField
           control={form.control}
-          name="dropOffLocation"
+          name="dropOffLocations"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
@@ -324,7 +354,13 @@ const RentalStep = ({ form }: { form: FormType }) => {
   );
 };
 
-const ConfirmationStep = ({ form }: { form: FormType }) => {
+const ConfirmationStep = ({
+  form,
+  pending,
+}: {
+  form: FormType;
+  pending: boolean;
+}) => {
   const errors = form.formState.errors;
   return (
     <div className="rounded-[10px] bg-white w-full lg:p-6 p-4">
@@ -385,7 +421,12 @@ const ConfirmationStep = ({ form }: { form: FormType }) => {
           </FormItem>
         )}
       />
-      <Button className="mt-6 lg:mt-8">Rent Now</Button>
+      <Button disabled={pending} className="mt-6 lg:mt-8">
+        <RenderIf condition={pending}>
+          <Spinner />
+        </RenderIf>
+        Rent Now
+      </Button>
     </div>
   );
 };

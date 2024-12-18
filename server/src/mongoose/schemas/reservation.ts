@@ -25,6 +25,46 @@ const reservationSchema = new Schema({
     enum: ["pending", "approved", "rejected", "canceled"],
     default: "pending",
   },
+  pickUpLocation: {
+    type: Types.ObjectId,
+    ref: "Location",
+    required: true,
+  },
+  dropOffLocations: {
+    type: Types.ObjectId,
+    ref: "Location",
+    required: true,
+  },
+  billing: {
+    name: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
+    townCity: {
+      type: String,
+      required: true,
+    },
+  },
+  hasReview: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 reservationSchema.set("toJSON", {

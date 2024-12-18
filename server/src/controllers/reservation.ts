@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Reservation from "../mongoose/schemas/reservation";
 import Rent from "../mongoose/schemas/rent";
 import { calculateDateDifference } from "../utils/date";
+import { Rent as TRent } from "../types/schema";
 
 const getAll = async (req: Request, res: Response) => {
   try {
@@ -10,7 +11,16 @@ const getAll = async (req: Request, res: Response) => {
     if (user?.role !== "admin") {
       filter.user = user?._id.toString() ?? "";
     }
-    const reservations = await Reservation.find();
+    const reservations = await Reservation.find(filter)
+      .populate("rent", "images price currency name description total")
+      .populate("dropOffLocations")
+      .populate("pickUpLocation");
+
+    reservations.forEach((reservation) => {
+      (reservation.rent as TRent).images = (
+        reservation.rent as TRent
+      ).images.map((image) => `${process.env.BASE_URL}/public/rent/${image}`);
+    });
     res.json({
       message: "reservations fetched successfully!",
       items: reservations,
@@ -25,7 +35,17 @@ const getAll = async (req: Request, res: Response) => {
 };
 const create = async (req: Request, res: Response) => {
   try {
-    const { rentId, startDate, endDate } = req.matchedData;
+    const {
+      rentId,
+      startDate,
+      endDate,
+      pickUpLocation,
+      dropOffLocations,
+      billingAddress,
+      billingName,
+      billingPhoneNumber,
+      billingTownCity,
+    } = req.matchedData;
     const rent = await Rent.findById(rentId);
     if (!rent) {
       res.status(404).json({ message: "Rent not found" });
@@ -50,6 +70,14 @@ const create = async (req: Request, res: Response) => {
     const reservation = new Reservation({
       rent: rentId,
       user: req.user?._id,
+      pickUpLocation,
+      dropOffLocations,
+      billing: {
+        name: billingName,
+        address: billingAddress,
+        phoneNumber: billingPhoneNumber,
+        townCity: billingTownCity,
+      },
       startDate,
       endDate,
       total,

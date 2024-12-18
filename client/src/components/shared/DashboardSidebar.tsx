@@ -1,4 +1,4 @@
-import { CarIcon, Home } from "lucide-react";
+import { CalendarIcon, CarIcon, Home } from "lucide-react";
 
 import {
   Sidebar,
@@ -22,6 +22,11 @@ const items = [
     title: "Car Rents",
     url: paths.DASHBOARD.RENTS.LIST,
     icon: CarIcon,
+  },
+  {
+    title: "Reservations",
+    url: paths.DASHBOARD.RESERVATIONS.LIST,
+    icon: CalendarIcon,
   },
 ];
 
