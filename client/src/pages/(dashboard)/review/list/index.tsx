@@ -3,13 +3,13 @@ import { columns } from "./columns";
 import { QUERY_KEYS } from "@/constants/query-keys";
 
 import { Spinner } from "@/components/shared/Spinner";
-import reservationService from "@/services/reservation";
+import reviewService from "@/services/review";
 import { DataTable } from "@/components/shared/DataTable";
 
-export const DashboardReservationsListPage = () => {
+export const DashboardReviewsListPage = () => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: [QUERY_KEYS.ADMIN_RESERVATIONS],
-    queryFn: () => reservationService.getAll(),
+    queryKey: [QUERY_KEYS.ADMIN_REVIEWS],
+    queryFn: () => reviewService.getAll(),
   });
 
   console.log(data);
@@ -30,7 +30,7 @@ export const DashboardReservationsListPage = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-primary font-bold text-2xl ">Reservations</h3>
+        <h3 className="text-primary font-bold text-2xl ">Reviews</h3>
       </div>
       <DataTable columns={columns} data={items} />
     </div>

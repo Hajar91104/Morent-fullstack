@@ -26,6 +26,11 @@ const reviewSchema = new Schema({
     min: 1,
     max: 5,
   },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected", "canceled"],
+    default: "pending",
+  },
 });
 
 reviewSchema.set("toJSON", {

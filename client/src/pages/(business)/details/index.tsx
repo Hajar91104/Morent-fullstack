@@ -50,7 +50,7 @@ export const DetailsPage = () => {
         <ImagesSection images={rent.images} />
         <InformationSection rent={rent} />
       </div>
-      <ReviewSection />
+      <ReviewSection reviews={rent.reviews} />
       <List maxCols={3} heading="Recent Cars" />
       <List
         maxCols={3}

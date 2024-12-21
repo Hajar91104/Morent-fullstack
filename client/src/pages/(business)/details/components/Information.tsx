@@ -30,16 +30,20 @@ export const InformationSection = ({ rent }: Props) => {
     category,
     price,
     discount,
+    reviews,
   } = rent;
+  const rating = Math.round(
+    reviews.reduce((acc, review) => review.rating + acc, 0) / reviews.length
+  );
   return (
     <div className="bg-white rounded-[10px] p-4 lg:p-6 relative">
       <h1 className="text-secondary-500 text-2xl lg:text-[32px] !leading-[-0.96px] font-bold">
         {name}
       </h1>
       <div className="mt-2 flex items-center gap-x-2">
-        <ReviewStar rating={5} />
+        <ReviewStar rating={rating} />
         <p className="text-secondary text-sm font-medium tracking-[-0.28px]">
-          440+ Reviewer
+          {reviews.length} Reviewers
         </p>
         <button
           onClick={() => {

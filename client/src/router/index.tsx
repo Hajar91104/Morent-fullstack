@@ -13,6 +13,8 @@ import EditPage from "@/pages/(dashboard)/rents/edit";
 import { AuthLayout } from "@/components/shared/AuthLoayout";
 import { ReservationsPage } from "@/pages/(business)/reservations";
 import { DashboardReservationsListPage } from "@/pages/(dashboard)/reservations/list";
+import { DashboardReviewsListPage } from "@/pages/(dashboard)/review/list";
+import { ChatPage } from "@/pages/(dashboard)/chat";
 
 export const router = createBrowserRouter([
   {
@@ -68,6 +70,14 @@ export const router = createBrowserRouter([
           {
             path: paths.DASHBOARD.RESERVATIONS.LIST,
             element: <DashboardReservationsListPage />,
+          },
+          {
+            path: paths.DASHBOARD.REVIEWS.LIST,
+            element: <DashboardReviewsListPage />,
+          },
+          {
+            path: paths.DASHBOARD.CHAT,
+            element: <ChatPage />,
           },
         ],
       },

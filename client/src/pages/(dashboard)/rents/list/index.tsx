@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { columns } from "./columns";
-import { DataTable } from "./data-table";
 import { QUERY_KEYS } from "@/constants/query-keys";
 
 import rentService from "@/services/rent";
@@ -8,6 +7,7 @@ import { Spinner } from "@/components/shared/Spinner";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { paths } from "@/constants/paths";
+import { DataTable } from "@/components/shared/DataTable";
 
 export const DashboardRentListPage = () => {
   const { data, isLoading, isError } = useQuery({

@@ -1,34 +1,33 @@
 import { ReviewStar } from "@/components/shared/ReviewStar";
+import { formatDate } from "@/lib/utils";
+import { Review as TReview } from "@/types";
 import { User2Icon } from "lucide-react";
 
-export const Review = () => {
+type Props = {
+  review: TReview;
+};
+export const Review = ({ review }: Props) => {
+  const { author } = review;
+  const fullName = `${author.name} ${author.surname}`;
   return (
     <div className="flex gap-x-4">
       <div className="bg-primary rounded-full h-14 w-14 p-3">
         <User2Icon className="w-full h-full text-white" />
       </div>
       <div className="w-full">
-        <div className="flex justify-between w-full">
-          <div>
-            <h6 className="text-secondary-500 text-lg lg:text-xl font-bold leading-[150%] tracking-[-0.6px]">
-              Alex Stanton
-            </h6>
-            <p className="text-secondary-300 text-sm font-medium leading-[150%] tracking-[-0.28px]">
-              Ceo At Amazon
-            </p>
-          </div>
-          <div>
+        <div className="flex items-center justify-between w-full">
+          <h6 className="text-secondary-500 text-lg lg:text-xl font-bold leading-[150%] tracking-[-0.6px]">
+            {fullName}
+          </h6>
+          <div className="-translate-y-3">
             <p className="text-secondary-300 text-sm font-medium leading-[150%] tracking-[-0.28px] text-end mb-2">
-              21 July 2022
+              {formatDate(review.createdAt, "DD MMM yyyy")}
             </p>
-            <ReviewStar rating={4} />
+            <ReviewStar rating={review.rating} />
           </div>
         </div>
         <p className="text-sm font-normal !leading-[200%] tracking-[-0.28px] mt-3 text-secondary">
-          We are very happy with the service from the MORENT App. Morent has a
-          low price and also a large variety of cars with good and comfortable
-          facilities. In addition, the service provided by the officers is also
-          very friendly and very polite.
+          {review.content}
         </p>
       </div>
     </div>

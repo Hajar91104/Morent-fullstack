@@ -30,6 +30,7 @@ export type Rent = {
   total: number;
   pickUpLocation: Location;
   showInRecommendation: boolean;
+  reviews: Review[];
 };
 export type Category = {
   _id: string;
@@ -58,6 +59,16 @@ export type Reservation = {
   _id: string;
   hasReview: boolean;
 };
+export type Review = {
+  author: User;
+  content: string;
+  createdAt: string;
+  id: string;
+  rating: number;
+  rent: Rent;
+  status: ReviewStatus;
+  _id: string;
+};
 export type SelectOption = {
   value: string;
   label: string;
@@ -72,4 +83,9 @@ export enum ReservationStatus {
   Approved = "approved",
   Rejected = "rejected",
   Canceled = "canceled",
+}
+export enum ReviewStatus {
+  Pending = "pending",
+  Approved = "approved",
+  Rejected = "rejected",
 }

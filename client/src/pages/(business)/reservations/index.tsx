@@ -68,6 +68,8 @@ const ReservationCard = ({ reservation }: { reservation: Reservation }) => {
   function handleCancelReservation() {
     mutate({ id: reservation.id });
   }
+  console.log(rent.images[0]);
+
   return (
     <div className="bg-white shadow-md rounded-lg p-4 relative">
       <div className="flex items-end justify-between">
