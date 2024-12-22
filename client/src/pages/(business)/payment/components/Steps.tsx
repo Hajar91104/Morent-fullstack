@@ -221,6 +221,8 @@ const RentalStep = ({ form }: { form: FormType }) => {
 
   const pickUpLocation = (rentData?.item.pickUpLocation as Location) || null;
 
+  console.log(data);
+
   useEffect(() => {
     form.setValue("pickUpLocation", pickUpLocation._id);
   }, []);

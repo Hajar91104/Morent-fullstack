@@ -17,10 +17,18 @@ const getAll = async (req: Request, res: Response) => {
       .populate("pickUpLocation");
 
     reservations.forEach((reservation) => {
-      (reservation.rent as TRent).images = (
-        reservation.rent as TRent
-      ).images.map((image) => `${process.env.BASE_URL}/public/rent/${image}`);
+      const rent = reservation.rent as TRent;
+      if (rent.images) {
+        console.log(rent.images);
+
+        const newImages = rent.images.map((image) => {
+          return `${process.env.BASE_URL}/public/rent/${image}`;
+        });
+        rent.images = [...newImages];
+      }
+      console.log(rent);
     });
+
     res.json({
       message: "reservations fetched successfully!",
       items: reservations,

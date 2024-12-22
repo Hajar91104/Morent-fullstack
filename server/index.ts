@@ -7,6 +7,9 @@ import passport from "passport";
 import cors from "cors";
 import path from "path";
 
+import { createServer } from "node:http";
+import { Server } from "socket.io";
+
 import "./src/mongoose/schemas/review";
 
 import authRoutes from "./src/routes/auth";
@@ -23,6 +26,41 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
+
+const socketUsers: Record<string, string> = {};
+
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+
+  socket.on("register", (userId) => {
+    socketUsers[userId] = socket.id;
+  });
+
+  socket.on("message", (message, to) => {
+    console.log(message);
+    const socketId = socketUsers[to];
+    if (socketId) {
+      socket.to(socketId).emit("message", message);
+    }
+    // io.emit("message", message);
+    // socket.broadcast.emit("meassage", message);
+  });
+
+  socket.on("disconnect", () => {
+    Object.entries(socketUsers).forEach((item) => {
+      if (item[1] === socket.id) {
+        delete socketUsers[item[0]];
+      }
+    });
+  });
+});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -53,7 +91,7 @@ app.use("/rent", rentRoutes);
 app.use("/reservation", reservationRoutes);
 app.use("/review", reviewRoutes);
 // app.use("/users", usersRoutes);
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 

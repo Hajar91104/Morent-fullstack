@@ -189,7 +189,7 @@ export const ActionForm = ({ type }: Props) => {
     );
   }
   return (
-    <div>
+    <div className="pt-6">
       <h1 className="text-2xl text-primary mb-4 font-bold">Create Rent</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

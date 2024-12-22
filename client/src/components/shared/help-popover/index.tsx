@@ -1,11 +1,20 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { RenderIf } from "../RenderIf";
 import { User2Icon } from "lucide-react";
 import { useLocation } from "react-router-dom";
+import { useSocket } from "@/hooks/use-socket";
+import { useSelector } from "react-redux";
+import { selectUserData } from "@/store/features/userSlice";
+import { getUserId } from "@/lib/utils";
 
 export const HelpPopover = () => {
   const [isOpen, setIsOpen] = useState(false);
+  // const { user } = useSelector(selectUserData);
   const location = useLocation();
+  const socket = useSocket();
+  const inputRef = useRef<HTMLInputElement>(null);
+  // const id = getUserId(user);
+  console.log(socket);
 
   useEffect(() => {
     function handleOutsideClick() {
@@ -14,9 +23,26 @@ export const HelpPopover = () => {
     window.addEventListener("click", handleOutsideClick);
     return () => window.removeEventListener("click", handleOutsideClick);
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("message", (message) => {
+      console.log("message: ", message);
+    });
+  }, [socket]);
+
   if (location.pathname.includes("dashboard")) {
     return null;
   }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!socket) return;
+    e.preventDefault();
+    const message = inputRef.current?.value.trim();
+    if (!message) return;
+    inputRef.current!.value = "";
+    socket.emit("message", { message, to: "67533d1f3d746bbb668230dd" });
+  };
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
       <button
@@ -78,11 +104,14 @@ export const HelpPopover = () => {
           </div>
 
           <div className="flex items-center pt-0">
-            <form className="flex items-center justify-center w-full space-x-2">
+            <form
+              onSubmit={handleSubmit}
+              className="flex items-center justify-center w-full space-x-2"
+            >
               <input
+                ref={inputRef}
                 className="flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2"
                 placeholder="Type your message"
-                value=""
               />
               <button className="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] disabled:pointer-events-none disabled:opacity-50 bg-black hover:bg-[#111827E6] h-10 px-4 py-2">
                 Send

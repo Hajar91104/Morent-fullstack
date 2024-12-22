@@ -29,7 +29,7 @@ export const DashboardRentListPage = () => {
 
   const items = data?.data?.items || [];
   return (
-    <div>
+    <div className="pt-6">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-primary font-bold text-2xl ">Rents</h3>
         <Button asChild>
