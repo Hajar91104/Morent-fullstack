@@ -76,7 +76,11 @@ export const router = createBrowserRouter([
             element: <DashboardReviewsListPage />,
           },
           {
-            path: paths.DASHBOARD.CHAT,
+            path: paths.DASHBOARD.CHAT.VIEW,
+            element: <ChatPage />,
+          },
+          {
+            path: paths.DASHBOARD.CHAT.USER(),
             element: <ChatPage />,
           },
         ],

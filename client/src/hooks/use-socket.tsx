@@ -11,15 +11,19 @@ export const useSocket = () => {
   useEffect(() => {
     if (loading) return;
     const id = getUserId(user);
+
     const newSocket = io(import.meta.env.VITE_APP_API_BASE_URL, {
       withCredentials: true,
     });
 
-    newSocket.emit("register", id);
+    newSocket.on("connect", () => {
+      newSocket.emit("register", id);
+      setSocket(newSocket);
+    });
 
-    setSocket(newSocket);
-
-    // return () => newSocket.close();
+    return () => {
+      newSocket.disconnect();
+    };
   }, [loading]);
 
   useEffect(() => {

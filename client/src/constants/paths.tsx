@@ -17,6 +17,9 @@ export const paths = {
     REVIEWS: {
       LIST: "/dashboard/reviews",
     },
-    CHAT: "/dashboard/chat",
+    CHAT: {
+      VIEW: "/dashboard/chat",
+      USER: (id = ":id") => `/dashboard/chat/${id}`,
+    },
   },
 };

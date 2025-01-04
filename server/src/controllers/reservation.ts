@@ -6,6 +6,7 @@ import { Rent as TRent } from "../types/schema";
 
 const getAll = async (req: Request, res: Response) => {
   try {
+    const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
     const user = req.user;
     const filter: Record<string, string> = {};
     if (user?.role !== "admin") {
@@ -17,16 +18,14 @@ const getAll = async (req: Request, res: Response) => {
       .populate("pickUpLocation");
 
     reservations.forEach((reservation) => {
-      const rent = reservation.rent as TRent;
-      if (rent.images) {
-        console.log(rent.images);
-
-        const newImages = rent.images.map((image) => {
-          return `${process.env.BASE_URL}/public/rent/${image}`;
-        });
-        rent.images = [...newImages];
-      }
-      console.log(rent);
+      (reservation.rent as TRent).images = (
+        reservation.rent as TRent
+      ).images.map((image) => {
+        const validImage = image ?? ""; // Ensure the image is never undefined
+        return validImage.startsWith(BASE_URL)
+          ? validImage
+          : `${BASE_URL}/public/rent/${validImage}`;
+      });
     });
 
     res.json({

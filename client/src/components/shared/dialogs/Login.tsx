@@ -26,7 +26,7 @@ import { AxiosError } from "axios";
 import { AuthResponseType } from "@/services/auth/types";
 import { useDispatch } from "react-redux";
 import { useAppDispatch } from "@/hooks/redux";
-import { getCurrentUserAsync } from "@/store/features/UserSlice";
+import { getCurrentUserAsync } from "@/store/features/userSlice";
 
 const formSchema = z.object({
   email: z.string().min(2).max(50),

@@ -10,16 +10,20 @@ import path from "path";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 
-import "./src/mongoose/schemas/review";
+import "./mongoose/schemas/review";
 
-import authRoutes from "./src/routes/auth";
-import locationRoutes from "./src/routes/location";
-import categoryRoutes from "./src/routes/category";
-import rentRoutes from "./src/routes/rent";
-import reservationRoutes from "./src/routes/reservation";
-import reviewRoutes from "./src/routes/review";
+import authRoutes from "./routes/auth";
+import locationRoutes from "./routes/location";
+import categoryRoutes from "./routes/category";
+import rentRoutes from "./routes/rent";
+import reservationRoutes from "./routes/reservation";
+import reviewRoutes from "./routes/review";
+import conversationRoutes from "./routes/conversation";
 // import usersRoutes from "./routes/users.mjs";
-import "./src/auth/local-strategy";
+import "./auth/local-strategy";
+import { connectSocket } from "./socket";
+
+import "./mongoose/schemas/message";
 
 dotenv.config();
 
@@ -27,40 +31,7 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    credentials: true,
-  },
-});
-
-const socketUsers: Record<string, string> = {};
-
-io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
-
-  socket.on("register", (userId) => {
-    socketUsers[userId] = socket.id;
-  });
-
-  socket.on("message", (message, to) => {
-    console.log(message);
-    const socketId = socketUsers[to];
-    if (socketId) {
-      socket.to(socketId).emit("message", message);
-    }
-    // io.emit("message", message);
-    // socket.broadcast.emit("meassage", message);
-  });
-
-  socket.on("disconnect", () => {
-    Object.entries(socketUsers).forEach((item) => {
-      if (item[1] === socket.id) {
-        delete socketUsers[item[0]];
-      }
-    });
-  });
-});
+connectSocket(server);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -80,7 +51,7 @@ app.use(
     },
   })
 );
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/public", express.static(path.join(__dirname, "../public")));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -90,6 +61,7 @@ app.use("/category", categoryRoutes);
 app.use("/rent", rentRoutes);
 app.use("/reservation", reservationRoutes);
 app.use("/review", reviewRoutes);
+app.use("/conversation", conversationRoutes);
 // app.use("/users", usersRoutes);
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

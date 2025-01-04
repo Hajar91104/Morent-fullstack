@@ -1,21 +1,93 @@
+import { RenderIf } from "@/components/shared/RenderIf";
+import { paths } from "@/constants/paths";
+import { QUERY_KEYS } from "@/constants/query-keys";
 import { useSocket } from "@/hooks/use-socket";
 import { cn } from "@/lib/utils";
+import conversationService from "@/services/conversation";
 import { selectUserData } from "@/store/features/userSlice";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 
 export const ChatPage = () => {
+  const { id } = useParams();
   const { user } = useSelector(selectUserData);
-  console.log("user", user);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
+  const { data: conversationData, isLoading } = useQuery({
+    queryKey: [QUERY_KEYS.ADMIN_CONVERSATIONS],
+    queryFn: conversationService.getAll,
+  });
+  const {
+    data: chatData,
+    isLoading: isChatLoading,
+    status,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.ADMIN_CHAT, id],
+    queryFn: () => conversationService.getById({ id: id! }),
+    enabled: !!id,
+  });
+  const [messages, setMessages] = useState<
+    { text: string; userId: string; createdAt: string }[]
+  >([]);
   const socket = useSocket();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!socket) return;
+    e.preventDefault();
+    const message = inputRef.current?.value.trim();
+    const to = chatData?.data?.item?.userId;
+    const from = user?._id;
+    if (!message || !to || !from) return;
+    inputRef.current!.value = "";
+    socket.emit("message", {
+      message,
+      to,
+      from,
+    });
+    setMessages((prev) => [
+      ...prev,
+      { text: message, userId: from, createdAt: new Date().toISOString() },
+    ]);
+  };
+
+  useEffect(() => {
+    if (status === "success" && chatData) {
+      setMessages(chatData.data?.item?.messages || []);
+    }
+  }, [chatData]);
 
   useEffect(() => {
     if (!socket) return;
     socket.on("message", (message) => {
-      console.log("message", message);
+      if (message.conversation !== window.location.pathname.split("/").pop())
+        return;
+      setMessages((prev) => [...prev, message]);
     });
   }, [socket]);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+  //   socket.on("message", (message) => {
+  //     console.log("message", message);
+  //   });
+  // }, [socket]);
+
+  useEffect(() => {
+    if (wrapperRef.current) {
+      wrapperRef.current.scrollTo({
+        top: wrapperRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages]);
+
+  if (isLoading || isChatLoading) return <div>Loading...</div>;
+  const conversations = conversationData?.data?.item || [];
+  console.log(conversationData?.data);
+
   return (
     <>
       <div className="flex h-full min-h-[calc(100vh-250px)]  antialiased text-gray-800">
@@ -65,88 +137,50 @@ export const ChatPage = () => {
                 </span>
               </div>
               <div className="flex flex-col space-y-1 mt-4 -mx-2 h-48 overflow-y-auto">
-                <button className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">
-                  <div className="flex items-center justify-center h-8 w-8 bg-indigo-200 rounded-full">
-                    H
-                  </div>
-                  <div className="ml-2 text-sm font-semibold">Henry Boyd</div>
-                </button>
-                <button className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">
-                  <div className="flex items-center justify-center h-8 w-8 bg-gray-200 rounded-full">
-                    M
-                  </div>
-                  <div className="ml-2 text-sm font-semibold">Marta Curtis</div>
-                  <div className="flex items-center justify-center ml-auto text-xs text-white bg-red-500 h-4 w-4 rounded leading-none">
-                    2
-                  </div>
-                </button>
-                <button className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">
-                  <div className="flex items-center justify-center h-8 w-8 bg-orange-200 rounded-full">
-                    P
-                  </div>
-                  <div className="ml-2 text-sm font-semibold">
-                    Philip Tucker
-                  </div>
-                </button>
-                <button className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">
-                  <div className="flex items-center justify-center h-8 w-8 bg-pink-200 rounded-full">
-                    C
-                  </div>
-                  <div className="ml-2 text-sm font-semibold">
-                    Christine Reid
-                  </div>
-                </button>
-                <button className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2">
-                  <div className="flex items-center justify-center h-8 w-8 bg-purple-200 rounded-full">
-                    J
-                  </div>
-                  <div className="ml-2 text-sm font-semibold">Jerry Guzman</div>
-                </button>
+                {conversations.map((conversation) => (
+                  <Link
+                    key={conversation._id}
+                    to={paths.DASHBOARD.CHAT.USER(conversation._id)}
+                    className="flex flex-row items-center hover:bg-gray-100 rounded-xl p-2"
+                    style={{
+                      backgroundColor: id === conversation._id ? "#f1f1f1" : "",
+                    }}
+                  >
+                    <div className="flex uppercase items-center justify-center h-8 w-8 bg-indigo-200 rounded-full">
+                      {conversation.userName[0]}
+                    </div>
+                    <div className="ml-2 text-sm font-semibold">
+                      {conversation.userName}
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
           <div className="flex flex-col flex-auto h-full p-6">
             <div className="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 h-full p-4">
-              <div className="flex flex-col h-full overflow-x-auto mb-4">
-                <div className="flex flex-col h-full">
-                  <div className="grid grid-cols-12 gap-y-2 max-h-[640px]">
-                    <MessageItem message="Hello, how can i help you?" owner />
-                    <MessageItem
-                      message="Hello i can't finish my reservation"
-                      owner={false}
-                    />
-                    <MessageItem message="Lox" owner />
+              <RenderIf condition={!!id}>
+                <div
+                  ref={wrapperRef}
+                  className="flex flex-col h-full overflow-x-auto mb-4"
+                >
+                  <div className="flex flex-col h-full">
+                    <div className="grid grid-cols-12 gap-y-2 max-h-[640px]">
+                      {messages.map((message, idx) => (
+                        <MessageItem
+                          key={idx}
+                          message={message.text}
+                          owner={message.userId === user?._id}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
-                <div>
-                  <button className="flex items-center justify-center text-gray-400 hover:text-gray-600">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-                <div className="flex-grow ml-4">
-                  <div className="relative w-full">
-                    <input
-                      type="text"
-                      className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
-                    />
-                    <button className="absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600">
+                <div className="flex flex-row items-center h-16 rounded-xl bg-white w-full px-4">
+                  <div>
+                    <button className="flex items-center justify-center text-gray-400 hover:text-gray-600">
                       <svg
-                        className="w-6 h-6"
+                        className="w-5 h-5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -156,34 +190,72 @@ export const ChatPage = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth="2"
-                          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
                         ></path>
                       </svg>
                     </button>
                   </div>
+                  <div className="flex-grow ml-4">
+                    <form
+                      id="chat-form"
+                      onSubmit={handleSubmit}
+                      className="relative w-full"
+                    >
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        className="flex w-full border rounded-xl focus:outline-none focus:border-indigo-300 pl-4 h-10"
+                      />
+                      <button className="absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600">
+                        <svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          ></path>
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                  <div className="ml-4">
+                    <button
+                      type="submit"
+                      form="chat-form"
+                      className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0"
+                    >
+                      <span>Send</span>
+                      <span className="ml-2">
+                        <svg
+                          className="w-4 h-4 transform rotate-45 -mt-px"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                          ></path>
+                        </svg>
+                      </span>
+                    </button>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <button className="flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 rounded-xl text-white px-4 py-1 flex-shrink-0">
-                    <span>Send</span>
-                    <span className="ml-2">
-                      <svg
-                        className="w-4 h-4 transform rotate-45 -mt-px"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                        ></path>
-                      </svg>
-                    </span>
-                  </button>
+              </RenderIf>
+              <RenderIf condition={!id}>
+                <div className="flex w-full h-full items-center justify-center">
+                  <p className="text-xl font-bold">Select a conversation</p>
                 </div>
-              </div>
+              </RenderIf>
             </div>
           </div>
         </div>

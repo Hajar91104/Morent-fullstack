@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { ModalTypeEnum, useDialog } from "@/hooks/useDialog";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { logoutAsync, selectUserData } from "@/store/features/UserSlice";
+import { logoutAsync, selectUserData } from "@/store/features/userSlice";
 import { LogOut, User2Icon } from "lucide-react";
 
 import {
@@ -59,7 +59,7 @@ export const NavbarActions = () => {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {user.role === UserRole.Admin && (
-              <DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link to={paths.DASHBOARD.MAIN}>Dashboard</Link>
               </DropdownMenuItem>
             )}

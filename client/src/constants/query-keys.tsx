@@ -9,4 +9,7 @@ export const QUERY_KEYS = {
   RECOMMENDATION_RENTS: "recommendationRents",
   RENT_LIST: "rentList",
   RENT_DETAIL: "rentDetail",
+  USER_CONVERSATION: "userConversation",
+  ADMIN_CONVERSATIONS: "adminConversations",
+  ADMIN_CHAT: "adminChat",
 };
