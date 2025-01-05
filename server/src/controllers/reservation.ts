@@ -21,7 +21,7 @@ const getAll = async (req: Request, res: Response) => {
       (reservation.rent as TRent).images = (
         reservation.rent as TRent
       ).images.map((image) => {
-        const validImage = image ?? ""; // Ensure the image is never undefined
+        const validImage = image ?? "";
         return validImage.startsWith(BASE_URL)
           ? validImage
           : `${BASE_URL}/public/rent/${validImage}`;
