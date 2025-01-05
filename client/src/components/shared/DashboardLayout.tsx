@@ -9,7 +9,7 @@ import { selectUserData } from "@/store/features/userSlice";
 export const DashboardLayout = () => {
   const { user, loading } = useAppSelector(selectUserData);
 
-  if (loading || user === null) {
+  if (loading) {
     return <div>Loading ...</div>;
   }
 
